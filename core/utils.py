@@ -373,6 +373,8 @@ def format_channel_name(bot, author, exclude_channel=None, force_null=False):
     else:
         if bot.config["use_user_id_channel_name"]:
             name = new_name = str(author.id)
+        elif bot.config["use_timestamp_channel_name"]:
+            name = new_name = author.created_at.isoformat(sep="-", timespec="minutes")
         else:
             name = author.name.lower()
             if force_null:
@@ -467,7 +469,9 @@ def get_joint_id(message: discord.Message) -> typing.Optional[int]:
     """
     if message.embeds:
         try:
-            return int(getattr(message.embeds[0].author, "url", "").split("#")[-1])
+            url = getattr(message.embeds[0].author, "url", "")
+            if url:
+                return int(url.split("#")[-1])
         except ValueError:
             pass
     return None
